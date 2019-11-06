@@ -1,8 +1,8 @@
-# Anaconda install for the bash-completion library and scripts
+# A conda recipe for creating a `bash-completion` package.
 
-This library is provides sophisticated tab completion support for a large number of
-command line utilities.  In particular, it is required by the `conda-bash-completion`
-package which provides tab completion for the `conda` command.
+The [`bash-completion`][1] library provides sophisticated tab completion support for
+a large number of command line utilities.  In particular, it is required by the
+`conda-bash-completion` package which provides tab completion for the `conda` command.
 
 There a various scenarios we need to account for when patching the upstream to work with
 Anaconda.  This is complicated by the conflicting expectations of 'shell integration'
