@@ -51,8 +51,6 @@ Additional Problem:
     This raises the question: should conda activate/deactivate add/remove the
     target environments `/share` directory to/from the `$XDG_DATA_DIRS`?
 
-[1](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
-
 ## What about existing bash-completion users?
 
 This case introduces some alternatives to Step 1 in the above scenario:
@@ -161,3 +159,8 @@ the python libraries installed in the `base` environment.  In this
 ## Conclusion
 
 At this point a combination of Solutions 1, 5, 6, and 8 seems to be the best compromise.
+
+## References
+
+[1](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
+
