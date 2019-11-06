@@ -1,4 +1,4 @@
-# A conda recipe for `bash-completion` package.
+# A conda recipe for the `bash-completion` package.
 
 The [`bash-completion`][1] library provides sophisticated tab completion support for
 a large number of command line utilities.  In particular, it is required by the
