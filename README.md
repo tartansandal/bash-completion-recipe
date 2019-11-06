@@ -1,4 +1,4 @@
-# A conda recipe for creating a `bash-completion` package.
+# A conda recipe for `bash-completion` package.
 
 The [`bash-completion`][1] library provides sophisticated tab completion support for
 a large number of command line utilities.  In particular, it is required by the
@@ -31,8 +31,8 @@ This raises the following problem:
 Two solutions come to mind:
 
 1. Patch the `__load_completion` function in the `bash_completion` library script so the
-   "place-holder prefixed" `/share/bash-completion/completions` dir is searched for
-   completions.
+   "place-holder prefixed" `/share/bash-completion/completions` directory is searched
+   for completions.
 
 2. Patch the `bash_completion.sh` to ensure the "place-holder prefixed" `/share`
    directory is in `$XDG_DATA_DIRS`. 
@@ -77,8 +77,8 @@ Naturally this introduces some more problems:
    script directories are searched.
 
 4. In scenario 11, we want bash completion to work for commands outside of our
-   current conda environment, and completion code installed by pacakges in our
-   active environment to supercede those installed system-wide (in the same way
+   current conda environment, and completion code installed by packages in our
+   active environment to supersede those installed system-wide (in the same way
    that a conda installed version of python shadows the system installed version).
 
 5. In scenario 12, we the version of the library that is loaded may be different
@@ -107,8 +107,8 @@ Solutions:
    can patch `bash-completion.sh` to only load the library if the existing version is
    'different' from the one being loaded.  
 
-   This saves us from an unnessary double load, but still allows for the library to
-   be overriden, addressing Problem 5.
+   This saves us from an unnecessary double load, but still allows for the library to
+   be overridden, addressing Problem 5.
 
 ## What about users who install `bash-completion` into a non-base environment.
 
@@ -125,7 +125,7 @@ This introduces some new problems:
 6. The appropriate `bash_completion.sh` script is not being sourced.
 
 7. Unloading the completions from the current shell would be very complicated and
-   not 100% garanteed to work.  So a deactivate hook can not be expected to work.
+   not 100% guaranteed to work.  So a deactivate hook can not be expected to work.
 
 Possible Solutions:
 
@@ -164,8 +164,8 @@ the python libraries installed in the `base` environment.  In this
 At this point a combination of Solutions 1, 5, 6, and 8 seems to be the best compromise.
 
 1. Patch the `__load_completion` function in the `bash_completion` library script so the
-   "place-holder prefixed" `/share/bash-completion/completions` dir is searched for
-   completions.
+   "place-holder prefixed" `/share/bash-completion/completions` directory is searched
+   for completions.
 
 5. The bash_completion library sets a BASH_COMPLETION_VERSION_INFO variable, so we can
    patch `bash-completion.sh` to only load the library if the existing version is
