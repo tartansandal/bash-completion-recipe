@@ -44,7 +44,7 @@ Additional Problem:
     
 2. One problem with Solution 2 is it may change the behaviour of other conda
     installed packages -- those that also search `$XDG_DATA_DIRS`. This would help
-    Anaconda to better align itself with the [XDG Base Directory Specification][1]
+    Anaconda to better align itself with the [XDG Base Directory Specification][2]
     Although this may be a good thing, its not really the responsibility of this
     package, and packages should not have potentially far reaching side-effects. 
 
@@ -160,7 +160,9 @@ the python libraries installed in the `base` environment.  In this
 
 At this point a combination of Solutions 1, 5, 6, and 8 seems to be the best compromise.
 
+
+
 ## References
 
-[1]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-
+[1]: https://github.com/scop/bash-completion
+[2]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
