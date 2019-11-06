@@ -162,5 +162,5 @@ At this point a combination of Solutions 1, 5, 6, and 8 seems to be the best com
 
 ## References
 
-[1](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
+[1]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
