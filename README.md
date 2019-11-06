@@ -55,30 +55,30 @@ Additional Problem:
 
 This case introduces some alternatives to Step 1 in the above scenario:
 
-1.a The target system already has a active system-wide installation of
+10. The target system already has a active system-wide installation of
     `bash-completion` 
 
-1.b The target system has system-wide packages installed that provide
+11. The target system has system-wide packages installed that provide
     `bash-completion` scripts for their own commands.
 
-1.c The system installed version of `bash-completion` is different from the version
+12. The system installed version of `bash-completion` is different from the version
     installed into the users `base` environment. 
 
 Naturally this introduces some more problems:
 
-3. In scenario 1.a, either the system or user `bashrc` scripts will ensure that
+3. In scenario 10, either the system or user `bashrc` scripts will ensure that
     `/etc/profile.d/bash_completion.sh` is sourced early in the initialization
     process, typically before the hooks provided by `conda init bash`.  The
     `bash_completion.sh` script has a check to prevent it from being loaded multiple
     times, so our conda install library is never loaded and none of its completion
     script directories are searched.
 
-4. In scenario 1.b, we want bash completion to work for commands outside of our
+4. In scenario 11, we want bash completion to work for commands outside of our
     current conda environment, and completion code installed by pacakges in our
     active environment to supercede those installed system-wide (in the same way
     that a conda installed version of python shadows the system installed version).
 
-5. In scenario 1.c, we the version of the library that is loaded may be different
+5. In scenario 12, we the version of the library that is loaded may be different
     from the version specified by the environment. However, our expectation is that
     the environment version is always preferred.   
 
@@ -109,10 +109,10 @@ Solutions:
 
 ## What about users who install `bash-completion` into a non-base environment.
 
-Modified Scenario Steps:
+Modified Scenario Steps 2 and 4:
 
-2.a User installs a version of `bash-completion` in a specific environment.
-4.a User expects that version of bash completion to be active only that environment.
+20. User installs a version of `bash-completion` in a specific environment.
+40. User expects that version of bash completion to be active only that environment.
 
 Solutions 1 and 2 use the "place-holder prefix" so that paths to the library and data
 directories are already accounted for in this case.
