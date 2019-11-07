@@ -43,18 +43,23 @@ Steps in this Scenario:
 
 This raises the following problem:
 
-**Problem 1**
+**Problem 1:**
+
 > The `/share/bash-completion/completions/` directory under the base environment's root
 > is not searched for completion scripts by the upstream library.
 
 Two solutions come to mind:
 
-1. Patch the `__load_completion` function in the `bash_completion` library script so the
-   "place-holder prefixed" `/share/bash-completion/completions` directory is searched
-   for completions.
+**Solution 1:**
 
-2. Patch the `bash_completion.sh` to ensure the "place-holder prefixed" `/share`
-   directory is in `$XDG_DATA_DIRS`. 
+> Patch the `__load_completion` function in the `bash_completion` library script so the
+> "place-holder prefixed" `/share/bash-completion/completions` directory is searched for
+> completions.
+
+**Solution 2:**
+
+> Patch the `bash_completion.sh` to ensure the "place-holder prefixed" `/share`
+> directory is in `$XDG_DATA_DIRS`. 
 
 Note the "place-holder prefix" is `/opt/anaconda1anaconda2anaconda3` and gets replaced
 by the root of the environment that it gets installed into, in our case the `base`
@@ -64,14 +69,16 @@ Both of those solutions will work with the above Scenario and solves Problem 1.
 
 Additional Problem:
     
-2. One problem with Solution 2 is it may change the behaviour of other conda installed
-   packages -- those that also search `$XDG_DATA_DIRS`. This would help Anaconda to
-   better align itself with the [XDG Base Directory Specification][2] Although this may
-   be a good thing, its not really the responsibility of this package, and packages
-   should not have potentially far reaching side-effects. 
+**Problem 2:** 
 
-   This raises the question: should conda activate/deactivate add/remove the target
-   environments `/share` directory to/from the `$XDG_DATA_DIRS`?
+> One problem with Solution 2 is it may change the behaviour of other conda installed
+> packages -- those that also search `$XDG_DATA_DIRS`. This would help Anaconda to
+> better align itself with the [XDG Base Directory Specification][2] Although this may
+> be a good thing, its not really the responsibility of this package, and packages
+> should not have potentially far reaching side-effects. 
+> 
+> This raises the question: should conda activate/deactivate add/remove the target
+> environments `/share` directory to/from the `$XDG_DATA_DIRS`?
 
 ### What about existing bash-completion users?
 
@@ -88,51 +95,69 @@ This case introduces some alternatives to Step 1 in the above scenario:
 
 Naturally this introduces some more problems:
 
-3. In scenario 10, either the system or user `bashrc` scripts will ensure that
-   `/etc/profile.d/bash_completion.sh` is sourced early in the initialization
-   process, typically before the hooks provided by `conda init bash`.  The
-   `bash_completion.sh` script has a check to prevent it from being loaded multiple
-   times, so our conda install library is never loaded and none of its completion
-   script directories are searched.
+**Problem 3:** 
 
-4. In scenario 11, we want bash completion to work for commands outside of our
-   current conda environment, and completion code installed by packages in our
-   active environment to supersede those installed system-wide (in the same way
-   that a conda installed version of python shadows the system installed version).
+> In scenario 10, either the system or user `bashrc` scripts will ensure that
+> `/etc/profile.d/bash_completion.sh` is sourced early in the initialization process,
+> typically before the hooks provided by `conda init bash`.  The `bash_completion.sh`
+> script has a check to prevent it from being loaded multiple times, so our conda
+> install library is never loaded and none of its completion script directories are
+> searched.
 
-5. In scenario 12, we the version of the library that is loaded may be different
-   from the version specified by the environment. However, our expectation is that
-   the environment version is always preferred.   
+**Problem 4:** 
 
-6. There is a possibility that system installed completion scripts incompatible with
-   certain version of the `bash-completion` library.  Hopefully they have
-   appropriate version guards.
+> In scenario 11, we want bash completion to work for commands outside of our current
+> conda environment, and completion code installed by packages in our active environment
+> to supersede those installed system-wide (in the same way that a conda installed
+> version of python shadows the system installed version).
 
-Solutions:
+**Problem 5:** 
 
-3. Patch `bash-completion.sh` to remove the double load check.
+> In scenario 12, we the version of the library that is loaded may be different from the
+> version specified by the environment. However, our expectation is that the environment
+> version is always preferred.   
 
-   This addresses Problem 3, but has the potential to significantly slow down shell
-   and sub-shell initialization -- the bash-completion library is over 2000 lines of
-   shell script.
+**Problem 6:** 
 
-4. Patch `bash-completion.sh` to ensure the path to the "place-holder prefixed"
-   `/share` directory is in `$XDG_DATA_DIRS`, but before the double loading check.
+> There is a possibility that system installed completion scripts incompatible with
+> certain version of the `bash-completion` library.  Hopefully they have appropriate
+> version guards.
 
-   This addresses Problem 4, provided we ensure that the path is only added
-   once and that the path is added before system paths.
+Potential solutions:
 
-5. The bash_completion library sets a `BASH_COMPLETION_VERSION_INFO` variable, so we
-   can patch `bash-completion.sh` to only load the library if the existing version is
-   'different' from the one being loaded.  
+**Solution 3:**
 
-   This saves us from an unnecessary double load, but still allows for the library to
-   be overridden, addressing Problem 5.
+> Patch `bash-completion.sh` to remove the double load check.
+ 
+This addresses Problem 3, but has the potential to significantly slow down shell and
+sub-shell initialization -- the bash-completion library is over 2000 lines of shell
+script.
 
-6. Patch the upstream to set `$BASH_COMPLETION_VERSION_INFO` to
-   `$CONDA_BASH_COMPLETION_VERSION_INFO`.  This allows the conda packaged version to
-   override the system installed version, even if the version numbers are the same,
-   provided it is loaded last. 
+**Solution 4:**
+
+> Patch `bash-completion.sh` to ensure the path to the "place-holder prefixed" `/share`
+> directory is in `$XDG_DATA_DIRS`, but before the double loading check.
+ 
+This addresses Problem 4, provided we ensure that the path is only added once and that
+the path is added before system paths.
+
+**Solution 5:**
+
+> The library sets a `BASH_COMPLETION_VERSION_INFO` variable, so we can
+> patch `bash-completion.sh` to only load the library if the existing version is
+> 'different' from the one being loaded.  
+ 
+This saves us from an unnecessary double load, but still allows for the library to be
+overridden, addressing Problem 5.
+
+**Solution 6:**
+
+> Patch the upstream libray to set `$CONDA_BASH_COMPLETION_VERSION_INFO` to the same
+> value as `$BASH_COMPLETION_VERSION_INFO` and change the double-loading trap to check
+> for `$CONDA_BASH_COMPLETION_VERSION_INFO` instead of `$BASH_COMPLETION_VERSION_INFO`.
+
+This allows the conda packaged version to override the system installed version, even
+if the version numbers are the same, provided it is loaded last. 
 
 ### What about users who install `bash-completion` into a non-base environment.
 
@@ -146,22 +171,32 @@ directories are already accounted for in this case.
 
 This introduces some new problems:
 
-6. The appropriate `bash_completion.sh` script is not being sourced.
+**Problem 7:** 
 
-7. Unloading the completions from the current shell would be very complicated and
-   not 100% guaranteed to work.  So a deactivate hook can not be expected to work.
+> The appropriate `bash_completion.sh` script is not being sourced.
+
+**Problem 8:** 
+
+> Unloading the completions from the current shell would be very complicated and
+> not 100% guaranteed to work.  So a deactivate hook can not be expected to work.
 
 Possible Solutions:
 
-7. Add some hook to source the appropriate `bash_completion.sh` on activate.
+**Solution 7:**
 
-   The double load protection from Solution 5 will ensure appropriate cooperation
-   with this solution and Solution 1. 
+> Add some hook to source the appropriate `bash_completion.sh` on activate.
+ 
+The double load protection from Solution 5 will ensure appropriate cooperation
+with this solution and Solution 1. 
 
-8. Leave it up to the user to ensure that the appropriate `bash_completion.sh` is
-   sourced for non-base installs.
+**Solution 8:**
 
-9. Ensure the user understands these limitations via package documentation.
+> Leave it up to the user to ensure that the appropriate `bash_completion.sh` is
+> sourced for non-base installs.
+
+**Solution 9:**
+
+> Ensure the user understands these limitations via package documentation.
 
 ### What about users who don't activate the base environment by default?
 
@@ -176,28 +211,35 @@ Additional Scenario Steps:
 
 In this case we can't depend on environment activation hooks to help us out.
 
+**Problem 9:** 
+
 Does the use expect or care that other completion code is being loaded even though the
 environment is not active? 
 
-In this situation the user has access to a locally installed `conda` command.
-`$CONDA_ROOT/condabin` in their `$PATH` which uses `$CONDA_ROOT/bin/python` which uses
-the python libraries installed in the `base` environment.  In this 
 
 ### Conclusion
 
-At this point a combination of Solutions 1, 5, 7, and 9 seems to be the best compromise.
+At this point a combination of Solutions 1, 6, 7, and 9 seems to be the best compromise.
 
-1. Patch the `__load_completion` function in the `bash_completion` library script so the
-   "place-holder prefixed" `/share/bash-completion/completions` directory is searched
-   for completions.
+**Solution 1:**
 
-5. The bash_completion library sets a BASH_COMPLETION_VERSION_INFO variable, so we can
-   patch `bash-completion.sh` to only load the library if the existing version is
-   'different' from the one being loaded.  
+> Patch the `__load_completion` function in the `bash_completion` library script so the
+> "place-holder prefixed" `/share/bash-completion/completions` directory is searched for
+> completions.
 
-7. Add some hook to source the appropriate `bash_completion.sh` on activate.
+**Solution 6:**
 
-9. Ensure the user understands these limitations via package documentation.
+> Patch the upstream libray to set `$CONDA_BASH_COMPLETION_VERSION_INFO` to the same
+> value as `$BASH_COMPLETION_VERSION_INFO` and change the double-loading trap to check
+> for `$CONDA_BASH_COMPLETION_VERSION_INFO` instead of `$BASH_COMPLETION_VERSION_INFO`.
+
+**Solution 7:**
+
+> Add some hook to source the appropriate `bash_completion.sh` on activate.
+ 
+**Solution 9:**
+
+> Ensure the user understands these limitations via package documentation.
 
 [1]: https://github.com/scop/bash-completion
 [2]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
