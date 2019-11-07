@@ -44,7 +44,6 @@ Steps in this Scenario:
 This raises the following problem:
 
 **Problem 1**
-
 > The `/share/bash-completion/completions/` directory under the base environment's root
 > is not searched for completion scripts by the upstream library.
 
