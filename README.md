@@ -213,9 +213,11 @@ In this case we can't depend on environment activation hooks to help us out.
 
 **Problem 9:** 
 
-Does the use expect or care that other completion code is being loaded even though the
-environment is not active? 
+> Does the use expect or care that other completion code is being loaded even though the
+> environment is not active? 
 
+I think some might care, but they are operating outside of the standard practice so we
+should leave it up to them to decide and source the appropriate bits.
 
 ### Conclusion
 
