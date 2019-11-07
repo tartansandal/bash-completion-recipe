@@ -4,11 +4,29 @@ The [`bash-completion`][1] library provides sophisticated tab completion support
 a large number of command line utilities.  In particular, it is required by the
 `conda-bash-completion` package which provides tab completion for the `conda` command.
 
+Typically we expect users to install these packages into their `base` environment and to
+have that environment activated by default.  We patch the upstream source and implement
+activation hooks to make this "just work" for the most common case.
+
+Some uses prefer to disable the automatic activation of their `base` environment by
+setting he flag `auto_activate_base` to `false` in their `~/.condarc` file.
+
+These users will need to append the following
+```
+source $CONDA_ROOT/etc/profile.d/bash_completion.sh
+```
+to their `~/.bashrc` script in order to have the completion code loaded.
+
+## Rationale
+
 There a various scenarios we need to account for when patching the upstream to work with
 Anaconda.  This is complicated by the conflicting expectations of 'shell integration'
 and 'isolated environments'. 
 
-## How do we handle the simple happy path?
+The following is a long, rambling discussion I had (with myself) to try to pin down
+a solution that works best for the majority of users and is not too painful for others. 
+
+### How do we handle the simple happy path?
 
 Steps in this Scenario:
 
@@ -25,8 +43,9 @@ Steps in this Scenario:
 
 This raises the following problem:
 
-1. The `/share/bash-completion/completions/` directory under the base environment's root
-   is not searched for completion scripts by the upstream library.
+Problem 1.
+: The `/share/bash-completion/completions/` directory under the base environment's root
+is not searched for completion scripts by the upstream library.
 
 Two solutions come to mind:
 
@@ -54,7 +73,7 @@ Additional Problem:
    This raises the question: should conda activate/deactivate add/remove the target
    environments `/share` directory to/from the `$XDG_DATA_DIRS`?
 
-## What about existing bash-completion users?
+### What about existing bash-completion users?
 
 This case introduces some alternatives to Step 1 in the above scenario:
 
@@ -103,14 +122,19 @@ Solutions:
    This addresses Problem 4, provided we ensure that the path is only added
    once and that the path is added before system paths.
 
-5. The bash_completion library sets a BASH_COMPLETION_VERSION_INFO variable, so we
+5. The bash_completion library sets a `BASH_COMPLETION_VERSION_INFO` variable, so we
    can patch `bash-completion.sh` to only load the library if the existing version is
    'different' from the one being loaded.  
 
    This saves us from an unnecessary double load, but still allows for the library to
    be overridden, addressing Problem 5.
 
-## What about users who install `bash-completion` into a non-base environment.
+6. Patch the upstream to set `$BASH_COMPLETION_VERSION_INFO` to
+   `$CONDA_BASH_COMPLETION_VERSION_INFO`.  This allows the conda packaged version to
+   override the system installed version, even if the version numbers are the same,
+   provided it is loaded last. 
+
+### What about users who install `bash-completion` into a non-base environment.
 
 Modified Scenario Steps 2 and 4:
 
@@ -129,17 +153,17 @@ This introduces some new problems:
 
 Possible Solutions:
 
-6. Add some hook to source the appropriate `bash_completion.sh` on activate.
+7. Add some hook to source the appropriate `bash_completion.sh` on activate.
 
    The double load protection from Solution 5 will ensure appropriate cooperation
    with this solution and Solution 1. 
 
-7. Leave it up to the user to ensure that the appropriate `bash_completion.sh` is
+8. Leave it up to the user to ensure that the appropriate `bash_completion.sh` is
    sourced for non-base installs.
 
-8. Ensure the user understands these limitations via package documentation.
+9. Ensure the user understands these limitations via package documentation.
 
-## What about users who don't activate the base environment by default?
+### What about users who don't activate the base environment by default?
 
 Yes, some people prefer environments to be activated explicitly.
 
@@ -159,9 +183,9 @@ In this situation the user has access to a locally installed `conda` command.
 `$CONDA_ROOT/condabin` in their `$PATH` which uses `$CONDA_ROOT/bin/python` which uses
 the python libraries installed in the `base` environment.  In this 
 
-## Conclusion
+### Conclusion
 
-At this point a combination of Solutions 1, 5, 6, and 8 seems to be the best compromise.
+At this point a combination of Solutions 1, 5, 7, and 9 seems to be the best compromise.
 
 1. Patch the `__load_completion` function in the `bash_completion` library script so the
    "place-holder prefixed" `/share/bash-completion/completions` directory is searched
@@ -171,9 +195,9 @@ At this point a combination of Solutions 1, 5, 6, and 8 seems to be the best com
    patch `bash-completion.sh` to only load the library if the existing version is
    'different' from the one being loaded.  
 
-6. Add some hook to source the appropriate `bash_completion.sh` on activate.
+7. Add some hook to source the appropriate `bash_completion.sh` on activate.
 
-8. Ensure the user understands these limitations via package documentation.
+9. Ensure the user understands these limitations via package documentation.
 
 [1]: https://github.com/scop/bash-completion
 [2]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
