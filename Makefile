@@ -4,7 +4,4 @@ build:
 	conda build .
 
 install:
-	conda install --use-local --yes bash-completion
-
-uninstall:
-	conda uninstall --yes bash-completion
+	conda install --use-local --yes --force-reinstall bash-completion
