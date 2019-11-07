@@ -2,7 +2,7 @@
 
 The [`bash-completion`][1] library provides sophisticated tab completion support for
 a large number of command line utilities.  In particular, it is required by the
-`conda-bash-completion` package which provides tab completion for the `conda` command.
+[`conda-bash-completion`][2] package which provides tab completion for the `conda` command.
 
 Typically we expect users to install these packages into their `base` environment and to
 have that environment activated by default.  We patch the upstream source and implement
@@ -73,7 +73,7 @@ Additional Problem:
 
 > One problem with Solution 2 is it may change the behaviour of other conda installed
 > packages -- those that also search `$XDG_DATA_DIRS`. This would help Anaconda to
-> better align itself with the [XDG Base Directory Specification][2] Although this may
+> better align itself with the [XDG Base Directory Specification][3] Although this may
 > be a good thing, its not really the responsibility of this package, and packages
 > should not have potentially far reaching side-effects. 
 > 
@@ -244,4 +244,5 @@ At this point a combination of Solutions 1, 6, 7, and 9 seems to be the best com
 > Ensure the user understands these limitations via package documentation.
 
 [1]: https://github.com/scop/bash-completion
-[2]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+[2]: https://github.com/tartansandal/conda-bash-completion
+[3]: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
