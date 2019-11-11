@@ -1,4 +1,6 @@
-.PHONY: build install uninstall
+# aliases for maintaining this conda package
+
+.PHONY: build install
 
 build:
 	conda build .
