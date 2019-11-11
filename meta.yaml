@@ -7,12 +7,20 @@ source:
   git_rev: "{{ version }}"
   git_url: https://github.com/scop/bash-completion
   patches:
+    # bug in upstream which will be fixed by release 2.10
+    - sysvdirs.patch
+
+    # add a conda specific library loaded flag
     - track-conda-loaded.patch
+
+    # search for completions in the conda environment
     - completions-path.patch
+
+    # adjust double load trap to use conda specific
     - double-load-trap.patch
 
 build:
-  number: 7
+  number: 9
 
 requirements:
   build:
