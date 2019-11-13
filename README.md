@@ -9,10 +9,10 @@ have that environment activated by default.  We patch the upstream source and im
 activation hooks to make this "just work" for the most common case.
 
 Some uses prefer to disable the automatic activation of their `base` environment by
-setting he flag `auto_activate_base` to `false` in their `~/.condarc` file.
-
-These users will need to append the following
+setting `auto_activate_base: false` in their `~/.condarc` file.  These users
+will need to append something like the following
 ```
+CONDA_ROOT=~/anaconda3   # <- set to your Anaconda/Miniconda installation directory
 source $CONDA_ROOT/etc/profile.d/bash_completion.sh
 ```
 to their `~/.bashrc` script in order to have the completion code loaded.
