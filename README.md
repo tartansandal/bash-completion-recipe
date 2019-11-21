@@ -42,13 +42,13 @@ The `bash-completion` package supports the following graceful degradation:
 * If the user has not upgraded their `bash`, then the advanced completion features will
   never be loaded.
 
-If we make this package available to MacOS users, it will work for some, but not break
-anything. 
+If we make this package available to MacOS users, it will work for some, yet not break
+anything for others. 
 
 Is this acceptable?  (I have no idea what the distribution of the above 3 cases is like
 for MacOS users of conda).
 
-Should we leave it there or try to make things better for default MacOS users.
+Should we leave it there or try to make things better for default MacOS users?
 
 (Note that patching the whole library to support the older `bash` is not realistic -- it
 would be close to a complete rewrite and be hard to support in the long-term).
@@ -72,8 +72,17 @@ This begs the question: are MacOS users who haven't upgraded their `bash` even a
 advanced tab completion?  Would they even notice if we went to great lengths to provide
 it?
 
-The status quo works and there are future paths that could be explored based on
-feedback.
+### Proposals:
+
+1. Stick with the pacakge as is, but expose it to MacOS. 
+2. Document upgrading bash for conda users, including setting their login shell.
+3. Package a modern `bash` with the MacOS installer and tweak `conda init bash` to
+(optionally) set the user's login shell to it.
+4. Patch `conda-bash-completion` to provide limited support the older bash, but keep the
+   dependency on `bash-completion`.  
+
+My preference is 1 for now and to have 3 done by someone with significant MacOS
+experience.
 
 ## Rationale
 
