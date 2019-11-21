@@ -26,7 +26,7 @@ old (2007) version of `bash` (3.2.57), whereas the `bash-completion` library req
 
 1. [brew](https://brew.sh/)
 2. [bespoke packages](https://scriptingosx.com/2019/02/install-bash-5-on-macos/)
-3. conda
+3. [conda](https://docs.conda.io/)
 
 They may even choose to set their login shell to use the new version (if they can figure
 out how). 
@@ -43,34 +43,25 @@ The `bash-completion` package supports the following graceful degradation:
   never be loaded.
 
 If we make this package available to MacOS users, it will work for some, yet not break
-anything for others. 
-
-Is this acceptable?  (I have no idea what the distribution of the above 3 cases is like
-for MacOS users of conda).
-
-Should we leave it there or try to make things better for default MacOS users?
+anything for others.  Is this acceptable?  (I have no idea what the distribution of the
+above 3 cases is like for MacOS users of conda).  Should we leave it there or try to
+make things better for default MacOS users?
 
 (Note that patching the whole library to support the older `bash` is not realistic -- it
 would be close to a complete rewrite and be hard to support in the long-term).
 
 My feeling is that users that are aware of advanced completion will be running the newer
 `bash` anyway and will have already sorted out their login shell, but I could be
-completely wrong here.
-
-Perhaps new MacOS conda users could be directed to instructions for upgrading their
-login shell?
-
-Perhaps the `bash` could be packaged with the MacOS installer and `conda init bash`
-could be modified to (optionally) set the users login shell appropriately?
+completely wrong here.  Perhaps new MacOS conda users could be directed to instructions
+for upgrading their login shell?  Perhaps the `bash` could be packaged with the MacOS
+installer and `conda init bash` could be modified to (optionally) set the users
+login shell appropriately?
 
 Another side case to consider is `conda-bash-completion` -- the completion support for
 the `bash` command itself. This could be patched to provide limited completion for older
 versions of `bash`. I would not want to put the effort into this unless it is
-worthwhile. 
-
-This begs the question: are MacOS users who haven't upgraded their `bash` even aware of
-advanced tab completion?  Would they even notice if we went to great lengths to provide
-it?
+worthwhile.  Are MacOS users who haven't upgraded their `bash` even aware of advanced
+tab completion?  Would they even notice if we went to great lengths to provide it?
 
 ### Proposals:
 
