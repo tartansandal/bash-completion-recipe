@@ -17,6 +17,64 @@ source $CONDA_ROOT/etc/profile.d/bash_completion.sh
 ```
 to their `~/.bashrc` script in order to have the completion code loaded.
 
+## MacOS users
+
+We have a challenging situation, since the user's login shell is part of the underlying
+OS and not directly controlled by the conda ecosystem. By default MacOS come with a very
+old (2007) version of `bash` (3.2.57), whereas the `bash-completion` library requires
+4.1.0 from 2010.  However, many MacOS users upgrade this via:
+
+1. [brew](https://brew.sh/)
+2. [bespoke packages](https://scriptingosx.com/2019/02/install-bash-5-on-macos/)
+3. conda
+
+They may even choose to set their login shell to use the new version (if they can figure
+out how). 
+
+The `bash-completion` package supports the following graceful degradation:
+
+* If the user has upgraded their `bash` and adjusted their login shell, then the advanced
+  completion features will be loaded.
+
+* If the user has upgraded their `bash`, but not adjusted their login shell, then the
+  advanced completion features only be loaded when they start the newer `bash`.
+
+* If the user has not upgraded their `bash`, then the advanced completion features will
+  never be loaded.
+
+If we make this package available to MacOS users, it will work for some, but not break
+anything. 
+
+Is this acceptable?  (I have no idea what the distribution of the above 3 cases is like
+for MacOS users of conda).
+
+Should we leave it there or try to make things better for default MacOS users.
+
+(Note that patching the whole library to support the older `bash` is not realistic -- it
+would be close to a complete rewrite and be hard to support in the long-term).
+
+My feeling is that users that are aware of advanced completion will be running the newer
+`bash` anyway and will have already sorted out their login shell, but I could be
+completely wrong here.
+
+Perhaps new MacOS conda users could be directed to instructions for upgrading their
+login shell?
+
+Perhaps the `bash` could be packaged with the MacOS installer and `conda init bash`
+could be modified to (optionally) set the users login shell appropriately?
+
+Another side case to consider is `conda-bash-completion` -- the completion support for
+the `bash` command itself. This could be patched to provide limited completion for older
+versions of `bash`. I would not want to put the effort into this unless it is
+worthwhile. 
+
+This begs the question: are MacOS users who haven't upgraded their `bash` even aware of
+advanced tab completion?  Would they even notice if we went to great lengths to provide
+it?
+
+The status quo works and there are future paths that could be explored based on
+feedback.
+
 ## Rationale
 
 There a various scenarios we need to account for when patching the upstream to work with
@@ -106,7 +164,7 @@ Naturally this introduces some more problems:
 
 **Problem 4:** 
 
-> In scenario 11, we want bash completion to work for commands outside of our current
+> In scenario 11, we want `bash` completion to work for commands outside of our current
 > conda environment, and completion code installed by packages in our active environment
 > to supersede those installed system-wide (in the same way that a conda installed
 > version of python shadows the system installed version).
@@ -130,7 +188,7 @@ Potential solutions:
 > Patch `bash-completion.sh` to remove the double load check.
  
 This addresses Problem 3, but has the potential to significantly slow down shell and
-sub-shell initialization -- the bash-completion library is over 2000 lines of shell
+sub-shell initialization -- the `bash-completion` library is over 2000 lines of shell
 script.
 
 **Solution 4:**
@@ -152,7 +210,7 @@ overridden, addressing Problem 5.
 
 **Solution 6:**
 
-> Patch the upstream libray to set `$CONDA_BASH_COMPLETION_VERSION_INFO` to the same
+> Patch the upstream library to set `$CONDA_BASH_COMPLETION_VERSION_INFO` to the same
 > value as `$BASH_COMPLETION_VERSION_INFO` and change the double-loading trap to check
 > for `$CONDA_BASH_COMPLETION_VERSION_INFO` instead of `$BASH_COMPLETION_VERSION_INFO`.
 
@@ -231,7 +289,7 @@ At this point a combination of Solutions 1, 6, 7, and 9 seems to be the best com
 
 **Solution 6:**
 
-> Patch the upstream libray to set `$CONDA_BASH_COMPLETION_VERSION_INFO` to the same
+> Patch the upstream library to set `$CONDA_BASH_COMPLETION_VERSION_INFO` to the same
 > value as `$BASH_COMPLETION_VERSION_INFO` and change the double-loading trap to check
 > for `$CONDA_BASH_COMPLETION_VERSION_INFO` instead of `$BASH_COMPLETION_VERSION_INFO`.
 
