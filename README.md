@@ -1,5 +1,9 @@
 # A conda recipe for the `bash-completion` package.
 
+> This recipe has been moved to conda-forge and this repository has been retired.
+>
+> Please submit issues and pull requests to https://github.com/conda-forge/bash-completion-feedstock.
+
 The [`bash-completion`][1] library provides sophisticated tab completion support for
 a large number of command line utilities.  In particular, it is required by the
 [`conda-bash-completion`][2] package which provides tab completion for the `conda` command.
